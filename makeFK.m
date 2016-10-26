@@ -38,6 +38,23 @@ g_st = g_st + repmat([zeros(3,3), [xb;yb;zb;]; 0 0 0 0], [1,1,nJ+1]);
 % g_st(:,:,1+j) =  frame of output of link j wrt inertial
 % g_st(:,:,end) = frame of end effector wrt inertial
 
+%% Make gradients with respect to angles and lengths
+v = [th; lengths];
+xEff = g_st(1,4,end);
+yEff = g_st(2,4,end);
+REff = g_st(1:3,1:3,end);
+syms xd yd thd
+Td = [xd; yd; thd]; % the desired "pose" of the end effector
+rb = [xb; yb]; % the base location
+Rd = rotmat([0;0;1], thd);
+M = eye(3) - REff*Rd.';
+f = (xd - xEff)^2 + (yd - yEff)^2 + sum(sum(M.^2));
+dfdv = jacobian(f, v); % gradient
+ddfddv = jacobian(dfdv,v); % hessian
 
-
+%% here's how we can make this into an optimized matlab function:
+fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
+dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
+ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
+% note that these could also be written to a file
 

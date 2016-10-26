@@ -1,4 +1,5 @@
 function R = rotmat(n, theta)
+% function R = rotmat(n, theta)
 % find the 3D rotation matrix for any initial point
 % rp = R*r.
 % theta must be in radians. 
