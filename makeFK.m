@@ -45,7 +45,7 @@ yEff = g_st(2,4,end);
 REff = g_st(1:3,1:3,end);
 syms xd yd thd
 Td = [xd; yd; thd]; % the desired "pose" of the end effector
-rb = [xb; yb]; % the base location
+rb = [xb; yb; zb]; % the base location
 Rd = rotmat([0;0;1], thd);
 M = eye(3) - REff*Rd.';
 f = (xd - xEff)^2 + (yd - yEff)^2 + sum(sum(M.^2));
@@ -56,5 +56,7 @@ ddfddv = jacobian(dfdv,v); % hessian
 fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
 dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
 ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
+
 % note that these could also be written to a file
+fkFunc = matlabFunction(g_st, 'File', 'fkFunc', 'vars', {th, lengths, rb});
 
