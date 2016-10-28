@@ -1,8 +1,9 @@
 % Main function for optimization
+close all;
 
 % Create workspace poses, obstacles, other parameters
 p = []; % parameters structure: includes all non-decision variables
-p.nPoses = 5; % number of poses that we are trying to fit
+p.nPoses = 3; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
 p.nJoints = 3; % this is fixed for now: The number of actuated joints
@@ -10,10 +11,11 @@ p.nJoints = 3; % this is fixed for now: The number of actuated joints
 % make an initial guess: This will be important since its nonconvex.
 x0 = makeInitGuess(p);
 
+
 % other bounds
 % Max and min
-angleMax = pi;
-angleMin = -pi;
+angleMax = Inf;
+angleMin = -Inf;
 lengthMin = 0;
 lengthMax = 10;
 ub = [ones(p.nJoints*p.nPoses,1)*angleMax;...
@@ -24,9 +26,15 @@ lb = [ones(p.nJoints*p.nPoses,1)*angleMin;...
 A = []; b= [];
 Aeq = []; beq = [];
 
+% initial conditions plot
+startPlot;
+plotResults(x0, p);
+% disp('Press any key to start');
+% pause;
+disp('Optimizing...');
 
 % set up problem 
-options = optimoptions('fmincon','Display','iter');
+options = optimoptions('fmincon');
 problem.options = options;
 problem.solver = 'fmincon';
 problem.objective = @(x)(objFunc(x,p));
@@ -45,5 +53,6 @@ tic;
 timeToOpt = toc;
 
 % visualize results
-plotResults(x, p);
+plotResults(xFinal, p);
+
 

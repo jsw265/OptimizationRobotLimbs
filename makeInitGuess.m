@@ -6,9 +6,9 @@ nP = p.nPoses;
 nJ = p.nJoints;
 % use first angles that are just pointing at the points
 th01 = atan2(p.yd, p.xd);
-th0 = [th01 zeros(nP, nJ-1)].';
+th0 = [th01, zeros(nP, nJ-1)].';
 
-l1_0 = sqrt(p.xd.^2 + p.yd.^2);
+l1_0 = mean(sqrt(p.xd.^2 + p.yd.^2));
 l0 = [l1_0; zeros(nJ-1, 1)];
 
 % x = [thjoint1_pose1, th2_1, th3_1, th2_1, ...  lengths];

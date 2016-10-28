@@ -52,11 +52,25 @@ f = (xd - xEff)^2 + (yd - yEff)^2 + sum(sum(M.^2));
 dfdv = jacobian(f, v); % gradient
 ddfddv = jacobian(dfdv,v); % hessian
 
+% gradients wrt th
+dfdth = jacobian(f, th); % gradient
+ddfddth = jacobian(dfdth, th); % hessian
+
+% gradients wrt lengths
+dfdl = jacobian(f, lengths); % gradient
+ddfddl = jacobian(dfdl, lengths); % hessian
+
 %% here's how we can make this into an optimized matlab function:
-fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
-dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
-ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
+% fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
+% dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
+% ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
 
 % note that these could also be written to a file
 fkFunc = matlabFunction(g_st, 'File', 'fkFunc', 'vars', {th, lengths, rb});
+fFunc = matlabFunction(f, 'File', 'fFunc', 'vars', {th, lengths, rb, Td});
+dfdthFunc = matlabFunction(dfdth, 'File', 'dfdthFunc', 'vars', {th, lengths, rb, Td});
+dfdlFunc = matlabFunction(dfdl, 'File', 'dfdlFunc', 'vars', {th, lengths, rb, Td});
+ddfddthFunc = matlabFunction(ddfddth, 'File', 'ddfddthFunc', 'vars', {th, lengths, rb, Td});
+ddfddlFunc = matlabFunction(ddfddl, 'File', 'ddfddlFunc', 'vars', {th, lengths, rb, Td});
+
 
