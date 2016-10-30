@@ -3,10 +3,15 @@ close all;
 
 % Create workspace poses, obstacles, other parameters
 p = []; % parameters structure: includes all non-decision variables
-p.nPoses = 3; % number of poses that we are trying to fit
+p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 3; % this is fixed for now: The number of actuated joints
+p.nJoints = 2; % this is fixed for now: The number of actuated joints
+
+% physical parameters: will be used in extra objectives and constraints
+p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
+p.jointMaxTorque = 9; % N-m, the Continuous torque output of X-9 module (strongest of the series)
+p.gravity = [0;-9.81;0]; % gravitational acceleration vector in -y direction
 
 % make an initial guess: This will be important since its nonconvex.
 x0 = makeInitGuess(p);
@@ -49,10 +54,11 @@ problem.nonlcon = @(x)(nonlconFunc(x,p));
 
 % run optimization
 tic;
-[xFinal,fval,exitflag,output,lambda,grad,hessian] = fmincon(problem);
+[x,fval,exitflag,output,lambda,grad,hessian] = fmincon(problem);
 timeToOpt = toc;
 
 % visualize results
-plotResults(xFinal, p);
+plotResults(x, p);
 
-
+disp('Lengths:')
+disp(num2str(x(p.nJoints*p.nPoses+1:end)));

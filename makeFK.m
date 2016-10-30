@@ -4,7 +4,7 @@
 % inertial frame.
 % Julian Whitman, 10/26/2016
 
-nJ = 3; % number of joints
+nJ = 2; % number of joints
 lengths = sym('L', [nJ,1]);
 assume(lengths>=0);
 th = sym('th', [nJ,1]); 

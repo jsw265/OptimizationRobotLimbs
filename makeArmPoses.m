@@ -6,8 +6,8 @@ function [x, y, th] = makeArmPoses(n)
 % th [n x 1] = angle of the end effector wrt horizontal axis
 
  
-% for now, use random points
-xMax = 2;
+% for now, use random points in a square. Could change later.
+xMax = 2; % the farthest point away would be (2,2) here.
 yMax = 2;
 
 x = (rand(n,1)-.5)*2 * xMax;
