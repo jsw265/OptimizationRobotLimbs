@@ -1,4 +1,13 @@
 % Main function for optimization
+
+% To do: add xbase,ybase as design decision variables
+% To do: add static end effector angle offset as design decision variable
+% To do: make function that measures joint torques as a function of link
+%        length, number of joints, joint angles, and gravity direction
+% To do: add weights to each pose part. we may only care about end effector
+%        angle or location exactly at waypoints like the start and end points.
+% To do: make a neat/organized/thoughtful way to change the number of objectives and variables
+
 close all;
 
 % Create workspace poses, obstacles, other parameters
@@ -8,11 +17,7 @@ p.nPoses = 5; % number of poses that we are trying to fit
 p.xd = xd; p.yd = yd; p.thd = thd;
 p.nJoints = 2; % this is fixed for now: The number of actuated joints
 
-% other options:
-% To do: add xbase,ybase as design decision variables
-% To do: add static end effector angle offset as design decision variable
-% To do: make function that measures joint torques as a function of link
-%        length, number of joints, joint angles, and gravity direction
+% other options? Which functions to use, etc
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -22,7 +27,6 @@ p.linkMassPerLength = .425; % kg/m for thicker pipe. 0.226 kg/m if thinner pipe.
 
 % make an initial guess: This will be important since its nonconvex.
 x0 = makeInitGuess(p);
-
 
 % other bounds
 % Max and min
