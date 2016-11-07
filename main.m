@@ -60,7 +60,9 @@ end
 disp('Optimizing...');
 
 % set up problem 
-options = optimoptions('fmincon');
+options = optimoptions('fmincon',...
+    'Algorithm','interior-point',...
+    'SpecifyObjectiveGradient',true);
 problem.options = options;
 problem.solver = 'fmincon';
 problem.objective = @(x)(objFunc(x,p));
