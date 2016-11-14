@@ -17,8 +17,8 @@ p.nPoses = 5; % number of poses that we are trying to fit
 p.xd = xd; p.yd = yd; p.thd = thd;
 p.nJoints =3; % this is fixed for now: The number of actuated joints
 
-
 % other options? Which functions to use, etc
+p.writeVideo = 0; % A flag to say whether to make a video
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -34,7 +34,7 @@ x0 = makeInitGuess(p);
 angleMax = Inf;
 angleMin = -Inf;
 lengthMin = 0;
-lengthMax = 10;
+lengthMax = 5;
 ub = [ones(p.nJoints*p.nPoses,1)*angleMax;...
     ones(p.nJoints,1)*lengthMax]; 
 lb = [ones(p.nJoints*p.nPoses,1)*angleMin;...
@@ -85,3 +85,7 @@ plotResults(x, p);
 
 disp('Lengths:')
 disp(num2str(x(p.nJoints*p.nPoses+1:end)));
+
+if p.writeVideo
+    close(p.vid);
+end

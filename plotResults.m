@@ -24,3 +24,7 @@ set(p.outAngles, 'xdata', xJ(end,:), 'ydata', yJ(end,:), ...
 % axlims = axis;
 
 drawnow;
+
+if p.writeVideo
+writeVideo(p.vid, getframe);
+end

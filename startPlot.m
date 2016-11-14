@@ -1,3 +1,6 @@
+figure('name', 'Optimization Visualization', 'position', [50 50 800 800]);
+
+
 arrowLen = .5;
 axLims = [-1 1 -1 1]*(max(abs([p.xd; p.yd]))*1.5 + arrowLen);
 colors  = {'r', [1 .5 0], 'y', 'g', 'b',  [0.5 0 0.5]};
@@ -20,7 +23,7 @@ outAngles = quiver(0, 0, ...
             'LineStyle', ':');
 outArm = zeros(1,p.nPoses);
 for m=1:p.nPoses
-   outArm(m) = plot( 0, 0, 'g');
+   outArm(m) = plot( 0, 0, 'lineWidth', 2);
 end
 
 p.arrowLen = arrowLen;
@@ -31,3 +34,7 @@ p.outArm = outArm;
 axis(axLims);
 
 
+if p.writeVideo
+p.vid = VideoWriter('outputVideo.mp4', 'MPEG-4');
+open(p.vid)
+end
