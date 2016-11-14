@@ -15,10 +15,13 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints =3; % this is fixed for now: The number of actuated joints
+p.nJoints = 3; % this is fixed for now: The number of actuated joints
 
 % other options? Which functions to use, etc
-p.writeVideo = 0; % A flag to say whether to make a video
+p.writeVideo = false; % A flag to say whether to make a video
+p.useLengthObjective = false;
+p.useTorqueObjective = false;
+p.useTorqueConstraint = false;
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)

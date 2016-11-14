@@ -54,6 +54,24 @@ ddf = ddf + ddf_i;
   
 end
 
+%% evaluate extra objective 1: torques from gravity
+if p.useTorqueObjective
+   
+    % f = f + thing
+    % df = df + thing
+    % ddf = ddf + thing
+end
+
+if p.useLengthObjective
+    
+    % f = f + thing
+    % df = df + thing
+    % ddf = ddf + thing
+end
+
+
+
+
 plotResults(x, p)
 
 end
