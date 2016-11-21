@@ -57,13 +57,13 @@ ddf = ddf + ddf_i;
 %% evaluate extra objective 1: torques from gravity
 if p.useTorqueObjective
     f_torque_i = f_torqueFunc(th(:,i), lengths, rb);
-    f = f+p.torqueWeight*f_torque_i;
+    f = f+p.useTorqueObjective*f_torque_i;
     df_torquedth_i = dfdthFunc(th(:,i), lengths, rb, Td(:,i));
     df_torquedl_i = dfdlFunc(th(:,i), lengths, rb, Td(:,i));
     df_torque_i = zeros(1,p.nPoses*p.nJoints+p.nJoints);
     df_torque_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = df_torquedth_i;
     df_torque_i( p.nJoints*p.nPoses+1:end) = df_torquedl_i;
-    df = df + p.torqueWeight*df_torque_i;
+    df = df + p.useTorqueObjective*df_torque_i;
 end
 
 if p.useLengthObjective

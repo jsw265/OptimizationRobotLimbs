@@ -67,9 +67,6 @@ tau = jacobian(Lagrangian,v)';
 dtau = jacobian(tau,v);
 f_tau = sum(tau.^2);
 
-p.tau = tau;
-p.dtau = dtau;
-
 % Gradient and Hessian with respect to torque (tau)
 df_torquedth = jacobian(f_tau, th); % Gradient
 ddf_torqueddth = jacobian(df_torquedth, th); % Hessian
@@ -77,6 +74,7 @@ df_torquedl = jacobian(f_tau, lengths); % Gradient
 ddf_torqueddl = jacobian(df_torquedl, lengths); % Hessian
 
 g_torqueFunc = matlabFunction(tau, 'File', 'g_torqueFunc', 'vars', {th, lengths, rb});
+gd_torqueFunc = matlabFunction(dtau, 'File', 'gd_torqueFunc', 'vars', {th, lengths, rb});
 f_torqueFunc = matlabFunction(f_tau, 'File', 'f_torqueFunc', 'vars', {th, lengths, rb});
 df_torquedthFunc = matlabFunction(df_torquedth, 'File', 'df_torquedthFunc', 'vars', {th, lengths, rb});
 ddf_torqueddthFunc = matlabFunction(ddf_torqueddth, 'File', 'ddf_torqueddthFunc', 'vars', {th, lengths, rb});
