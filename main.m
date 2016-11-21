@@ -19,8 +19,8 @@ p.nJoints = 3; % this is fixed for now: The number of actuated joints
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
-p.useLengthObjective = false;
-p.useTorqueObjective = false;
+p.useLengthObjective = true;
+p.useTorqueObjective = true;
 p.useTorqueConstraint = false;
 
 % physical parameters: will be used in extra objectives and constraints
@@ -28,6 +28,7 @@ p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
 p.jointMaxTorque = 9; % N-m, the Continuous torque output of X-9 module (strongest of the series)
 p.gravity = [0;-9.81;0]; % gravitational acceleration vector in -y direction
 p.linkMassPerLength = .425; % kg/m for thicker pipe. 0.226 kg/m if thinner pipe.
+p.torqueWeight = 0.000075;
 
 % make an initial guess: This will be important since its nonconvex.
 x0 = makeInitGuess(p);
@@ -56,6 +57,8 @@ catch
     nJ = p.nJoints;
     disp('Making FK functions...');
 makeFK;
+if p.
+makeTorqueFunc;
 plotResults(x0, p);
 end
 % disp('Press any key to start');

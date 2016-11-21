@@ -7,8 +7,8 @@ function [x, y, th] = makeArmPoses(n)
 
  
 % for now, use random points in a square. Could change later.
-xMax = 2; % the farthest point away would be (2,2) here.
-yMax = 2;
+xMax = 6; % the farthest point away would be (2,2) here.
+yMax = 6;
 
 x = (rand(n,1)-.5)*2 * xMax;
 y = (rand(n,1)-.5)*2 * yMax;
