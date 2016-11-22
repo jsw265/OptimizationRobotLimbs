@@ -10,17 +10,19 @@
 
 close all;
 addpath(genpath(pwd)); % adds all subfolders in this directory to path
+global p
 
 % Create workspace poses, obstacles, other parameters
 p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 2; % fixed for now: The number of actuated joints
+p.nJoints = 3; % fixed for now: The number of actuated joints
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
-p.useLengthObjective = false;
+p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
+p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.0001;
 p.useTorqueConstraint = 1;
 
