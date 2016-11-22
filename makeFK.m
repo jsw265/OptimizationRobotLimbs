@@ -6,9 +6,6 @@
 
 
 for nJ = 1:6
-% if ~exist('nJ')
-% nJ = 3; % number of joints
-% end
 
 disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 

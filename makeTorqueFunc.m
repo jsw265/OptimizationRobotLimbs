@@ -1,8 +1,9 @@
 % Ky Woodard, 11/19/2016
 
-if ~exist('nJ')
-nJ = 3; % number of joints
-end
+
+for nJ = 1:6
+
+disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 
 gravity = 9.81;
 lengths = sym('L', [nJ,1]);
@@ -13,7 +14,11 @@ syms xb yb zb real % the base location variables
 %% exponential products formula
 % assumes joint angles build off of eachother
 w = repmat([0 0 1].', [1,nJ]); % the joint axis: all are in plane for now
+if nJ>1
 q = [[0 cumsum(lengths(1:nJ-1)).']; zeros(2,nJ)]; % each col is a position of a joint at th = 0
+else
+q = [0 ; 0;0];
+end
 xiv = [-cross(w,q); w];
 
 g_st0 = sym(zeros(4,4,nJ+1)); % the position at zero joint angles
@@ -73,10 +78,16 @@ ddf_torqueddth = jacobian(df_torquedth, th); % Hessian
 df_torquedl = jacobian(f_tau, lengths); % Gradient
 ddf_torqueddl = jacobian(df_torquedl, lengths); % Hessian
 
-g_torqueFunc = matlabFunction(tau, 'File', 'g_torqueFunc', 'vars', {th, lengths, rb});
-gd_torqueFunc = matlabFunction(dtau, 'File', 'gd_torqueFunc', 'vars', {th, lengths, rb});
-f_torqueFunc = matlabFunction(f_tau, 'File', 'f_torqueFunc', 'vars', {th, lengths, rb});
-df_torquedthFunc = matlabFunction(df_torquedth, 'File', 'df_torquedthFunc', 'vars', {th, lengths, rb});
-ddf_torqueddthFunc = matlabFunction(ddf_torqueddth, 'File', 'ddf_torqueddthFunc', 'vars', {th, lengths, rb});
-df_torquedlFunc = matlabFunction(df_torquedl, 'File', 'df_torquedlFunc', 'vars', {th, lengths, rb});
-ddf_torqueddlFunc = matlabFunction(ddf_torqueddl, 'File', 'ddf_torqueddlFunc', 'vars', {th, lengths, rb});
+disp(['writing files for nJ = '  num2str(nJ)]);
+
+g_torqueFunc = matlabFunction(tau, 'File', ['g_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+gd_torqueFunc = matlabFunction(dtau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+f_torqueFunc = matlabFunction(f_tau, 'File', ['f_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+df_torquedthFunc = matlabFunction(df_torquedth, 'File', ['df_torquedthFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+ddf_torqueddthFunc = matlabFunction(ddf_torqueddth, 'File', ['ddf_torqueddthFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+df_torquedlFunc = matlabFunction(df_torquedl, 'File', ['df_torquedlFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+ddf_torqueddlFunc = matlabFunction(ddf_torqueddl, 'File', ['ddf_torqueddlFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+
+end
+
+disp('Done');

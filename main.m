@@ -16,7 +16,7 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 4; % this is fixed for now: The number of actuated joints
+p.nJoints = 2; % fixed for now: The number of actuated joints
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
