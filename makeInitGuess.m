@@ -14,4 +14,9 @@ l0 = [l1_0; zeros(nJ-1, 1)];
 % x = [thjoint1_pose1, th2_1, th3_1, th2_1, ...  lengths];
 x0 = [th0(:); l0];
 
+% add this on last:
+if p.slackUseJointWeighting
+    x0 = [x0; 2];
+end
+
 end

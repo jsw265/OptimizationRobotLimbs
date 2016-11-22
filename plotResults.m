@@ -2,8 +2,8 @@ function plotResults(x, p)
 % plot the results
 
 
-th = reshape(x(1:end-p.nJoints),  [p.nJoints, p.nPoses]);
-lengths = x(end-p.nJoints+1:end);
+th = reshape(x(1:p.nPoses*p.nJoints),  [p.nJoints, p.nPoses]);
+lengths = x(p.nPoses*p.nJoints + (1:p.nJoints));
 
 xJ = zeros(p.nJoints+1,p.nPoses); 
 yJ = zeros(p.nJoints+1,p.nPoses); 

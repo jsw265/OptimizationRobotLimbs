@@ -7,6 +7,8 @@
 % To do: add weights to each pose part. we may only care about end effector
 %        angle or location exactly at waypoints like the start and end points.
 % To do: make a neat/organized/thoughtful way to change the number of objectives and variables
+% To do: keep the arm from colliding with itself, with either a cost or
+% constraint.
 
 close all;
 addpath(genpath(pwd)); % adds all subfolders in this directory to path
@@ -26,8 +28,9 @@ p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.0001;
-p.useTorqueConstraint = 1;
+p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0.0001;
+p.slackUseJointWeighting = 1;
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -49,6 +52,12 @@ ub = [ones(p.nJoints*p.nPoses,1)*angleMax;...
     ones(p.nJoints,1)*lengthMax]; 
 lb = [ones(p.nJoints*p.nPoses,1)*angleMin;...
     ones(p.nJoints,1)*lengthMin];
+
+% for joint Slack var, to make everything the right size
+if p.slackUseJointWeighting
+ub = [ub; Inf]; lb = [lb; -Inf];
+end
+    
 % linear equality and inequality
 A = []; b= [];
 Aeq = []; beq = [];
@@ -92,6 +101,10 @@ th = reshape(x(1:p.nPoses*p.nJoints), [p.nJoints, p.nPoses]);
 disp('Angles:')
 disp(num2str(mod(th, 2*pi)));
 
+if p.slackUseJointWeighting
+jointSlack = x(end);
+disp(['Joint Slack: ' num2str(jointSlack)])
+end
 
 if p.writeVideo
     close(p.vid);
