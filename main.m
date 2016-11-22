@@ -32,6 +32,7 @@ p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0.0001;
 p.slackUseJointWeighting = 1;
 
+
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
 p.jointMaxTorque = 9; % N-m, the Continuous torque output of X-9 module (strongest of the series)
