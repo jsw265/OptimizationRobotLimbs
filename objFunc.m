@@ -73,7 +73,11 @@ end
 if p.useJointSmoothingObjective
     
     % f = f + thing
+    
+    
+    
     % df = df + thing
+    
     % ddf = ddf + thing
 end
 
