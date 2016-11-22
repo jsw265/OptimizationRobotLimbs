@@ -19,13 +19,15 @@ p.nPoses = 5; % number of poses that we are trying to fit
 p.xd = xd; p.yd = yd; p.thd = thd;
 p.nJoints = 3; % fixed for now: The number of actuated joints
 
+p.nJoints = min(p.nJoints, 6); % 6 is the max for now.
+
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.0001;
 p.useTorqueConstraint = 1;
-p.useJointSmoothingObjective = 1;
+p.jointSmoothingWeighting = 0.0001;
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -85,6 +87,11 @@ plotResults(x, p);
 
 disp('Lengths:')
 disp(num2str(x(p.nJoints*p.nPoses+1:end)));
+
+th = reshape(x(1:p.nPoses*p.nJoints), [p.nJoints, p.nPoses]);
+disp('Angles:')
+disp(num2str(mod(th, 2*pi)));
+
 
 if p.writeVideo
     close(p.vid);

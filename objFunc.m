@@ -70,15 +70,29 @@ if p.lengthObjectiveWeighting
     %ddf = ddf; All zeroes from linear objective function
 end
 
-if p.useJointSmoothingObjective
+if p.jointSmoothingWeighting
     
-    % f = f + thing
+    % penalize moving much between poses, using the metric ||I-R1*R2.'||_F 
+    % see "jointSmoothingSym" to see where the math comes from,
+    diff_th = diff(th, 1, 2);
+    diff_th = diff_th(:).';
     
+    % add objective scalar
+    f = f  - sum(sum(cos(diff_th))) * p.jointSmoothingWeighting;
+    dfJoints = zeros(1, p.nPoses*p.nJoints);
+    dfJoints(1:p.nJoints*(p.nPoses-1)) = sin(diff_th);
+    dfJoints((p.nJoints+1):p.nJoints*p.nPoses) = dfJoints((p.nJoints+1):p.nJoints*p.nPoses)...
+         - sin(diff_th);
     
+    % add gradient component
+    df(1:p.nJoints*p.nPoses) = df(1:p.nJoints*p.nPoses) + dfJoints*p.jointSmoothingWeighting;
     
-    % df = df + thing
+    % add hessian component
+    ddfJoints =  diag([cos(diff_th) zeros(1,p.nJoints)]) +diag([ zeros(1,p.nJoints) cos(diff_th)]) ...
+        - diag(cos(diff_th),p.nJoints) - diag(cos(diff_th),p.nJoints).';
+    ddf(1:p.nJoints*p.nPoses, 1:p.nJoints*p.nPoses) = ddf(1:p.nJoints*p.nPoses, 1:p.nJoints*p.nPoses) ...
+        + ddfJoints*p.jointSmoothingWeighting;
     
-    % ddf = ddf + thing
 end
 
 
