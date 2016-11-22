@@ -19,19 +19,10 @@ rb = [0;0;0];
 Td = [p.xd p.yd p.thd].';
 for i = 1:p.nPoses
     
-%     % calculate the cost from the fk:
-%    g_st = fkFunc(th(:,i), lengths, rb); % This depends on the existance of an fkFunc function
-% xEff = g_st(1,4,end);
-% yEff = g_st(2,4,end);
-% REff = g_st(1:3,1:3, end);
-% Rd = rotmat([0;0;1], p.thd(i));
-% M = eye(3) - REff*Rd.';
-% f_i = (p.xd(i) - xEff)^2 + (p.yd(i) - yEff)^2 + sum(sum(M.^2));
 
-% alternately calculate the cost from premade file
+% calculate the cost from premade file
 f_i = fFunc(th(:,i), lengths, rb, Td(:,i));
 f = f + f_i;
-
 
 dfdth_i = dfdthFunc(th(:,i), lengths, rb, Td(:,i));
 dfdl_i = dfdlFunc(th(:,i), lengths, rb, Td(:,i));
@@ -42,8 +33,8 @@ df = df + df_i;
 
 ddfddth_i = ddfddthFunc(th(:,i), lengths, rb, Td(:,i));
 ddfddl_i = ddfddlFunc(th(:,i), lengths, rb, Td(:,i));
-ddf_i = zeros(p.nPoses*p.nJoints+p.nJoints,p.nPoses*p.nJoints+p.nJoints);
 
+ddf_i = zeros(p.nPoses*p.nJoints+p.nJoints,p.nPoses*p.nJoints+p.nJoints);
 %% To do: check this, since I am not sure I got it right
 ddf_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints), ...
       (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = ddfddth_i;

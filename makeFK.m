@@ -4,9 +4,13 @@
 % inertial frame.
 % Julian Whitman, 10/26/2016
 
-if ~exist('nJ')
-nJ = 3; % number of joints
-end
+
+for nJ = 1:6
+% if ~exist('nJ')
+% nJ = 3; % number of joints
+% end
+
+disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 
 lengths = sym('L', [nJ,1]);
 assume(lengths>=0);
@@ -16,7 +20,11 @@ syms xb yb zb real % the base location variables
 %% exponential products formula
 % assumes joint angles build off of eachother
 w = repmat([0 0 1].', [1,nJ]); % the joint axis: all are in plane for now
+if nJ>1
 q = [[0 cumsum(lengths(1:nJ-1)).']; zeros(2,nJ)]; % each col is a position of a joint at th = 0
+else
+q = [0 ; 0;0];
+end
 xiv = [-cross(w,q); w];
 
 g_st0 = sym(zeros(4,4,nJ+1)); % the position at zero joint angles
@@ -68,12 +76,15 @@ ddfddl = jacobian(dfdl, lengths); % hessian
 % dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
 % ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
 
+disp(['writing files for nJ = '  num2str(nJ)]);
+
 % note that these could also be written to a file
-fkFunc = matlabFunction(g_st, 'File', 'fkFunc', 'vars', {th, lengths, rb});
-fFunc = matlabFunction(f, 'File', 'fFunc', 'vars', {th, lengths, rb, Td});
-dfdthFunc = matlabFunction(dfdth, 'File', 'dfdthFunc', 'vars', {th, lengths, rb, Td});
-dfdlFunc = matlabFunction(dfdl, 'File', 'dfdlFunc', 'vars', {th, lengths, rb, Td});
-ddfddthFunc = matlabFunction(ddfddth, 'File', 'ddfddthFunc', 'vars', {th, lengths, rb, Td});
-ddfddlFunc = matlabFunction(ddfddl, 'File', 'ddfddlFunc', 'vars', {th, lengths, rb, Td});
+fkFunc = matlabFunction(g_st, 'File', ['fkFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+fFunc = matlabFunction(f, 'File', ['fFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+dfdthFunc = matlabFunction(dfdth, 'File', ['dfdthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+dfdlFunc = matlabFunction(dfdl, 'File', ['dfdlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+ddfddthFunc = matlabFunction(ddfddth, 'File', ['ddfddthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+ddfddlFunc = matlabFunction(ddfddl, 'File', ['ddfddlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
 
-
+end
+disp('Done');
