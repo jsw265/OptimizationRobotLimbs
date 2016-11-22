@@ -23,6 +23,7 @@ p.writeVideo = false; % A flag to say whether to make a video
 p.useLengthObjective = false;
 p.useTorqueObjective = 0.0001;
 p.useTorqueConstraint = 1;
+p.useJointSmoothingObjective = 1;
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)

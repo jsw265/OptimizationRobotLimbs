@@ -63,6 +63,15 @@ if p.useLengthObjective
     % df = df + thing
     % ddf = ddf + thing
 end
+
+if p.useJointSmoothingObjective
+    
+    % f = f + thing
+    % df = df + thing
+    % ddf = ddf + thing
+end
+
+
 end
 
 
