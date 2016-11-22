@@ -69,6 +69,15 @@ if p.lengthObjectiveWeighting
     df = df + df_fromLength;
     %ddf = ddf; All zeroes from linear objective function
 end
+
+if p.useJointSmoothingObjective
+    
+    % f = f + thing
+    % df = df + thing
+    % ddf = ddf + thing
+end
+
+
 end
 
 

@@ -25,6 +25,7 @@ p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational an
 p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.0001;
 p.useTorqueConstraint = 1;
+p.useJointSmoothingObjective = 1;
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
