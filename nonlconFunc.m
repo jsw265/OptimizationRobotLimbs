@@ -43,11 +43,13 @@ if p.slackUseJointWeighting
     jointSlack = x(end);
     diff_th = diff(th, 1, 2);
     diff_th = diff_th(:);
-    cSlack = cos(diff_th) - jointSlack; % removed the constant terms
+    cSlack = cos(diff_th) - jointSlack - 1; %  rescaled by 4
     c = [c; cSlack];
     
     gradcSlack = -[diag(sin(diff_th)) zeros(p.nJoints*(p.nPoses-1), p.nJoints)] + ...
                   [ zeros(p.nJoints*(p.nPoses-1), p.nJoints) diag(sin(diff_th))];
+   gradcSlack = [gradcSlack zeros(p.nJoints*(p.nPoses-1), p.nJoints)...
+                                  -ones(p.nJoints*(p.nPoses-1),1)];
               
     gradc = [gradc; gradcSlack];
 end

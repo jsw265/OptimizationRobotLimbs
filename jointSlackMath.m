@@ -24,8 +24,8 @@ term = err/4 - 1;
 
 syms s
 -s-term(:) <= 0;
-
-jacobian(-s-term(:), th(:))
+syms l1 l2 l3 jointSlack
+jacobian(-s-term(:), [th(:);l1; l2; l3; s] )
 % 0 = jacobian(-s-term(:), th(:)) + [diag(sin(diff_th)), zeros(p.nJoints*(p.nPoses-1), p.nJoints)] - [ zeros(p.nJoints*(p.nPoses-1), p.nJoints) diag(sin(diff_th))]
 % jacobian(-s-term(:), th(:)) = -[diag(sin(diff_th)),
 % zeros(p.nJoints*(p.nPoses-1), p.nJoints)] + [ zeros(p.nJoints*(p.nPoses-1), p.nJoints) diag(sin(diff_th))]

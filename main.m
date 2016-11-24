@@ -19,7 +19,7 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 3; % fixed for now: The number of actuated joints
+p.nJoints = 4; % fixed for now: The number of actuated joints
 
 p.nJoints = min(p.nJoints, 6); % 6 is the max for now.
 
@@ -29,7 +29,7 @@ p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational an
 p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.0001;
 p.useTorqueConstraint = 0;
-p.jointSmoothingWeighting = 0.0001;
+p.jointSmoothingWeighting = 0;%0.0001;
 p.slackUseJointWeighting = 1;
 
 
