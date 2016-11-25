@@ -5,8 +5,10 @@ function x0 = makeInitGuess(p)
 nP = p.nPoses;
 nJ = p.nJoints;
 % use first angles that are just pointing at the points
-th01 = atan2(p.yd, p.xd);
-th0 = [th01, zeros(nP, nJ-1)].';
+% th01 = atan2(p.yd, p.xd);
+% th0 = [th01, zeros(nP, nJ-1)].';
+
+th0 = zeros(nJ, nP);
 
 l1_0 = mean(sqrt(p.xd.^2 + p.yd.^2));
 l0 = [l1_0; zeros(nJ-1, 1)];

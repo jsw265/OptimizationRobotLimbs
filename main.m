@@ -27,10 +27,10 @@ p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational an
 p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0;
 p.useTorqueConstraint = 0;
-p.jointSmoothingWeighting = 0.0001;
-p.variableBase = 1; % allows base location xb,yb to vary
-p.variableEnd = 1; % allows the end effector fixed angle wrt the last link to vary
-
+p.jointSmoothingWeighting = 0;%0.0001;
+p.variableBase = false; % allows base location xb,yb to vary
+p.variableEnd = false; % allows the end effector fixed angle wrt the last link to vary
+p.useGradient = true; % use the gradient in fmincon
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -77,7 +77,7 @@ disp('Optimizing...');
 % set up problem 
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
-    'SpecifyObjectiveGradient',true);
+    'SpecifyObjectiveGradient',p.useGradient);
 problem.options = options;
 problem.solver = 'fmincon';
 problem.objective = @(x)(objFunc(x,p));
@@ -99,7 +99,7 @@ timeToOpt = toc;
 plotResults(x, p);
 
 disp('Lengths:')
-disp(num2str(x(p.nJoints*p.nPoses+1:end)));
+disp(num2str(x(p.nJoints*p.nPoses+(1:p.nJoints))));
 
 th = reshape(x(1:p.nPoses*p.nJoints), [p.nJoints, p.nPoses]);
 disp('Angles:')

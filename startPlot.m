@@ -1,4 +1,4 @@
-figure('name', 'Optimization Visualization', 'position', [50 50 800 800]);
+figure('name', 'Optimization Visualization', 'position', [50 50 700 700]);
 
 
 arrowLen = .5;

@@ -18,7 +18,7 @@ elseif p.variableBase&&(~p.variableEnd)
 
 else
     thEff = sum(th,1);
-
+effOffset = 0;
 end
 
 
