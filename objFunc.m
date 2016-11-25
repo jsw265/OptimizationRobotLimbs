@@ -45,9 +45,9 @@ f = f + p.positionErrorObjectiveWeighting*f_i;
 
 dfdth_i = dfdthFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
 dfdl_i = dfdlFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
-df_i = zeros(1,p.nPoses*p.nJoints+p.nJoints);
+df_i = zeros(1,nVars);
 df_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = dfdth_i;
-df_i( p.nJoints*p.nPoses+1:end) = dfdl_i;
+df_i( p.nJoints*p.nPoses+(1:p.nJoints)) = dfdl_i;
 df = df + p.positionErrorObjectiveWeighting*df_i;
 
 ddfddth_i = ddfddthFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
@@ -63,10 +63,12 @@ ddf = ddf + p.positionErrorObjectiveWeighting*ddf_i;
 
 if p.variableBase
     inds = p.nJoints*p.nPoses+p.nJoints+(1:2);
-    df(inds)= df(inds)+...
-        dfdrbFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
-    ddf(inds,inds)= ddf(inds,inds)+...
-        ddfddrbFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
+    dfdrb = dfdrbFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
+    df(inds)= df(inds)+dfdrb(1:2); % only use x,y for 2D
+    
+    ddfddrb = ddfddrbFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
+    ddf(inds,inds)= ddf(inds,inds)+ ddfddrb(1:2,1:2); 
+    % only use x,y for 2D
 end
 if p.variableEnd
        df(effVarInd ) = df(effVarInd) + dfdeffOffsetFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
