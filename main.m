@@ -27,10 +27,10 @@ p.nJoints = min(p.nJoints, 6); % 6 is the max for now.
 p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
-p.useTorqueObjective = 0.0001;
+p.useTorqueObjective =0;%0.0001;
 p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0;%0.0001;
-p.slackUseJointWeighting = 1;
+p.slackUseJointWeighting = 10;
 
 
 % physical parameters: will be used in extra objectives and constraints

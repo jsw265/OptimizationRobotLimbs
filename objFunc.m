@@ -12,14 +12,16 @@ nVars = length(x);
 df = zeros(1,nVars);
 ddf = zeros(nVars, nVars);
 
+nJ = p.nJoints;
+nP = p.nPoses;
 
 % we want to reduce the sum of the squares of the error
-th = reshape(x(1:p.nPoses*p.nJoints), [p.nJoints, p.nPoses]);
-lengths = x(p.nPoses*p.nJoints+ (1:p.nJoints));
+th = reshape(x(1:nP*nJ), [nJ, nP]);
+lengths = x(nP*nJ+ (1:nJ));
 rb = [0;0;0];
 Td = [p.xd p.yd p.thd].';
 if p.positionErrorObjectiveWeighting
-    for i = 1:p.nPoses
+    for i = 1:nP
         
         
         % calculate the cost from premade file
@@ -28,23 +30,23 @@ if p.positionErrorObjectiveWeighting
         
         dfdth_i = dfdthFunc(th(:,i), lengths, rb, Td(:,i));
         dfdl_i = dfdlFunc(th(:,i), lengths, rb, Td(:,i));
-        df_i = zeros(1,p.nPoses*p.nJoints+p.nJoints);
-        df_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = dfdth_i;
-        df_i( p.nJoints*p.nPoses+1:end) = dfdl_i;
-        df(1: (p.nPoses*p.nJoints+p.nJoints)) = df(1: (p.nPoses*p.nJoints+p.nJoints)) ...
+        df_i = zeros(1,nP*nJ+nJ);
+        df_i( (i*nJ - (nJ-1)):(i*nJ) ) = dfdth_i;
+        df_i( nJ*nP+1:end) = dfdl_i;
+        df(1: (nP*nJ+nJ)) = df(1: (nP*nJ+nJ)) ...
             + p.positionErrorObjectiveWeighting*df_i;
         
         ddfddth_i = ddfddthFunc(th(:,i), lengths, rb, Td(:,i));
         ddfddl_i = ddfddlFunc(th(:,i), lengths, rb, Td(:,i));
         
-        ddf_i = zeros(p.nPoses*p.nJoints+p.nJoints,p.nPoses*p.nJoints+p.nJoints);
+        ddf_i = zeros(nP*nJ+nJ,nP*nJ+nJ);
         %% To do: check this, since I am not sure I got it right
-        ddf_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints), ...
-            (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = ddfddth_i;
-        ddf_i( p.nJoints*p.nPoses+1:end, ...
-            p.nJoints*p.nPoses+1:end) = ddfddl_i;
-        ddf((1: (p.nPoses*p.nJoints+p.nJoints)), (1: (p.nPoses*p.nJoints+p.nJoints))) = ...
-             ddf((1: (p.nPoses*p.nJoints+p.nJoints)), (1: (p.nPoses*p.nJoints+p.nJoints)))...
+        ddf_i( (i*nJ - (nJ-1)):(i*nJ), ...
+            (i*nJ - (nJ-1)):(i*nJ) ) = ddfddth_i;
+        ddf_i( nJ*nP+1:end, ...
+            nJ*nP+1:end) = ddfddl_i;
+        ddf((1: (nP*nJ+nJ)), (1: (nP*nJ+nJ))) = ...
+             ddf((1: (nP*nJ+nJ)), (1: (nP*nJ+nJ)))...
              + p.positionErrorObjectiveWeighting*ddf_i;
     end
     
@@ -57,10 +59,10 @@ end
         f = f+p.useTorqueObjective*f_torque_i;
         df_torquedth_i = dfdthFunc(th(:,i), lengths, rb, Td(:,i));
         df_torquedl_i = dfdlFunc(th(:,i), lengths, rb, Td(:,i));
-        df_torque_i = zeros(1,p.nPoses*p.nJoints+p.nJoints);
-        df_torque_i( (i*p.nJoints - (p.nJoints-1)):(i*p.nJoints) ) = df_torquedth_i;
-        df_torque_i( p.nJoints*p.nPoses+1:end) = df_torquedl_i;
-        df(1: (p.nPoses*p.nJoints+p.nJoints)) = df(1: (p.nPoses*p.nJoints+p.nJoints))...
+        df_torque_i = zeros(1,nP*nJ+nJ);
+        df_torque_i( (i*nJ - (nJ-1)):(i*nJ) ) = df_torquedth_i;
+        df_torque_i( nJ*nP+1:end) = df_torquedl_i;
+        df(1: (nP*nJ+nJ)) = df(1: (nP*nJ+nJ))...
             + p.useTorqueObjective*df_torque_i;
     end
     
@@ -68,9 +70,9 @@ end
         % Linearly penalizing component length
         
         df_fromLength = zeros(size(df));
-        df_fromLength(p.nPoses*p.nJoints+(1:p.nJoints)) = p.lengthObjectiveWeighting;
+        df_fromLength(nP*nJ+(1:nJ)) = p.lengthObjectiveWeighting;
         
-        f = f + p.lengthObjectiveWeighting*sum(x(p.nPoses*p.nJoints+1:end));
+        f = f + p.lengthObjectiveWeighting*sum(x(nP*nJ+1:end));
         df = df + df_fromLength;
         %ddf = ddf; All zeroes from linear objective function
     end
@@ -84,18 +86,18 @@ end
         
         % add objective scalar
         f = f  - sum(sum(cos(diff_th))) * p.jointSmoothingWeighting;
-        dfJoints = zeros(1, p.nPoses*p.nJoints);
-        dfJoints(1:p.nJoints*(p.nPoses-1)) = sin(diff_th);
-        dfJoints((p.nJoints+1):p.nJoints*p.nPoses) = dfJoints((p.nJoints+1):p.nJoints*p.nPoses)...
+        dfJoints = zeros(1, nP*nJ);
+        dfJoints(1:nJ*(nP-1)) = sin(diff_th);
+        dfJoints((nJ+1):nJ*nP) = dfJoints((nJ+1):nJ*nP)...
             - sin(diff_th);
         
         % add gradient component
-        df(1:p.nJoints*p.nPoses) = df(1:p.nJoints*p.nPoses) + dfJoints*p.jointSmoothingWeighting;
+        df(1:nJ*nP) = df(1:nJ*nP) + dfJoints*p.jointSmoothingWeighting;
         
         % add hessian component
-        ddfJoints =  diag([cos(diff_th) zeros(1,p.nJoints)]) +diag([ zeros(1,p.nJoints) cos(diff_th)]) ...
-            - diag(cos(diff_th),p.nJoints) - diag(cos(diff_th),p.nJoints).';
-        ddf(1:p.nJoints*p.nPoses, 1:p.nJoints*p.nPoses) = ddf(1:p.nJoints*p.nPoses, 1:p.nJoints*p.nPoses) ...
+        ddfJoints =  diag([cos(diff_th) zeros(1,nJ)]) +diag([ zeros(1,nJ) cos(diff_th)]) ...
+            - diag(cos(diff_th),nJ) - diag(cos(diff_th),nJ).';
+        ddf(1:nJ*nP, 1:nJ*nP) = ddf(1:nJ*nP, 1:nJ*nP) ...
             + ddfJoints*p.jointSmoothingWeighting;
         
     end
