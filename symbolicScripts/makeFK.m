@@ -5,14 +5,14 @@
 % Julian Whitman, 10/26/2016
 
 
-for nJ = 1:6
+for nJ = 1:5
 
 disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 
 lengths = sym('L', [nJ,1]);
 assume(lengths>=0);
 th = sym('th', [nJ,1]); 
-syms xb yb zb real % the base location variables
+syms xb yb zb effOffset real % the base location variables and end effector offset
 
 %% exponential products formula
 % assumes joint angles build off of eachother
@@ -28,6 +28,8 @@ g_st0 = sym(zeros(4,4,nJ+1)); % the position at zero joint angles
 for i = 1:nJ+1
 g_st0(:,:,i) = [eye(3) [sum(lengths(1:(i-1))); 0; 0]; [0 0 0 1]]; % transform to end effector at zero joint angles
 end
+g_st0(1:3,1:3, end) =  R_z(effOffset)*g_st0(1:3,1:3, end);
+
 
 % % forward kinematics with exponential formula:
 g_st = sym(zeros(4,4,nJ+1));
@@ -68,6 +70,14 @@ ddfddth = jacobian(dfdth, th); % hessian
 dfdl = jacobian(f, lengths); % gradient
 ddfddl = jacobian(dfdl, lengths); % hessian
 
+% gradients wrt base location
+dfdrb = jacobian(f, rb); % gradient
+ddfddrb = jacobian(dfdrb, rb); % hessian
+
+% gradients wrt end eff offset
+dfdeffOffset = jacobian(f, effOffset); % gradient
+ddfddeffOffset = jacobian(dfdeffOffset, effOffset); % hessian
+
 %% here's how we can make this into an optimized matlab function:
 % fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
 % dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
@@ -76,12 +86,16 @@ ddfddl = jacobian(dfdl, lengths); % hessian
 disp(['writing files for nJ = '  num2str(nJ)]);
 
 % note that these could also be written to a file
-fkFunc = matlabFunction(g_st, 'File', ['fkFunc' num2str(nJ)], 'vars', {th, lengths, rb});
-fFunc = matlabFunction(f, 'File', ['fFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-dfdthFunc = matlabFunction(dfdth, 'File', ['dfdthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-dfdlFunc = matlabFunction(dfdl, 'File', ['dfdlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-ddfddthFunc = matlabFunction(ddfddth, 'File', ['ddfddthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-ddfddlFunc = matlabFunction(ddfddl, 'File', ['ddfddlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+fkFunc = matlabFunction(g_st, 'File', ['fkFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset});
+fFunc = matlabFunction(f, 'File', ['fFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+dfdthFunc = matlabFunction(dfdth, 'File', ['dfdthFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+dfdlFunc = matlabFunction(dfdl, 'File', ['dfdlFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+dfdrbFunc = matlabFunction(dfdrb, 'File', ['dfdrbFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+dfdeffOffsetFunc = matlabFunction(dfdeffOffset, 'File', ['dfdeffOffsetFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+ddfddthFunc = matlabFunction(ddfddth, 'File', ['ddfddthFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+ddfddlFunc = matlabFunction(ddfddl, 'File', ['ddfddlFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+ddfddrbFunc = matlabFunction(ddfddrb, 'File', ['ddfddrbFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
+ddfddeffOffsetFunc = matlabFunction(ddfddeffOffset, 'File', ['ddfddeffOffsetFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset Td});
 
 end
 disp('Done');

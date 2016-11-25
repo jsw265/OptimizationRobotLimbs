@@ -25,9 +25,12 @@ p.nJoints = min(p.nJoints, 6); % 6 is the max for now.
 p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
-p.useTorqueObjective = 0.0001;
-p.useTorqueConstraint = 1;
+p.useTorqueObjective = 0;
+p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0.0001;
+p.variableBase = 1; % allows base location xb,yb to vary
+p.variableEnd = 1; % allows the end effector fixed angle wrt the last link to vary
+
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -49,6 +52,16 @@ ub = [ones(p.nJoints*p.nPoses,1)*angleMax;...
     ones(p.nJoints,1)*lengthMax]; 
 lb = [ones(p.nJoints*p.nPoses,1)*angleMin;...
     ones(p.nJoints,1)*lengthMin];
+if p.variableBase
+    lb = [lb; -lengthMax*p.nJoints;-lengthMax*p.nJoints];
+    ub = [ub; lengthMax*p.nJoints;lengthMax*p.nJoints];
+end
+if p.variableEnd
+    lb = [lb; -Inf];
+    ub = [ub; Inf];
+end
+
+
 % linear equality and inequality
 A = []; b= [];
 Aeq = []; beq = [];

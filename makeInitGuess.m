@@ -14,4 +14,13 @@ l0 = [l1_0; zeros(nJ-1, 1)];
 % x = [thjoint1_pose1, th2_1, th3_1, th2_1, ...  lengths];
 x0 = [th0(:); l0];
 
+if p.variableBase
+    x0 = [x0; 0;0];
+end
+if p.variableEnd
+    x0 = [x0; 0];
+end
+
+    
+
 end
