@@ -17,7 +17,7 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 2; % fixed for now: The number of actuated joints
+p.nJoints = 1; % fixed for now: The number of actuated joints
 
 p.nJoints = min(p.nJoints, 5); % 5 is the max for now.
 
@@ -113,9 +113,9 @@ end
 if p.variableEnd
     disp('End Eff Offset:')
     if p.variableBase
-        disp(x(p.nJoints*p.nPoses+p.nJoints+(3)));
+        disp(x(p.nJoints*p.nPoses+p.nJoints+3));
     else
-        disp(x(p.nJoints*p.nPoses+p.nJoints+(1)));
+        disp(x(p.nJoints*p.nPoses+p.nJoints+1));
         
     end
 end

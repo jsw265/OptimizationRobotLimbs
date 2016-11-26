@@ -27,7 +27,7 @@ end
 if p.variableBase&&p.variableEnd
         effVarInd = nJ*nP+nJ +3;
     effOffset = x(effVarInd);
-elseif p.variableBase&&(~p.variableEnd)
+elseif p.variableEnd&&(~p.variableBase)
             effVarInd = nJ*nP+nJ +1;
     effOffset = x(effVarInd);
 else

@@ -12,7 +12,7 @@ if p.variableBase&&p.variableEnd
     effOffset = x(p.nJoints*p.nPoses+p.nJoints +3);
         thEff = sum(th,1) + effOffset;
 
-elseif p.variableBase&&(~p.variableEnd)
+elseif p.variableEnd&&(~p.variableBase)
     effOffset = x(p.nJoints*p.nPoses+p.nJoints +1);
     thEff = sum(th,1) + effOffset;
 
