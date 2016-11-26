@@ -25,6 +25,7 @@ outArm = zeros(1,p.nPoses);
 for m=1:p.nPoses
    outArm(m) = plot( 0, 0, 'lineWidth', 2);
 end
+p.baseScatter = scatter(0,0,'k', 'filled');
 
 p.arrowLen = arrowLen;
 p.outAngles = outAngles;

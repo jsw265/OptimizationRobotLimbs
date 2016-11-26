@@ -3,7 +3,7 @@ function plotResults(x, p)
 
 
 th = reshape(x(1:p.nJoints*p.nPoses),  [p.nJoints, p.nPoses]);
-lengths = x((1:p.nJoints*p.nPoses)+p.nJoints);
+lengths = x(p.nJoints*p.nPoses+(1:p.nJoints));
 
 xJ = zeros(p.nJoints+1,p.nPoses); 
 yJ = zeros(p.nJoints+1,p.nPoses); 
@@ -40,6 +40,7 @@ set(p.outScatter, 'xdata', xJ(end,:) , 'ydata', yJ(end,:));
 set(p.outAngles, 'xdata', xJ(end,:), 'ydata', yJ(end,:), ...
     'udata', p.arrowLen*cos(thEff), 'vdata', p.arrowLen*sin(thEff));
 % axlims = axis;
+set(p.baseScatter, 'xdata', rb(1),'ydata', rb(2));
 
 drawnow;
 

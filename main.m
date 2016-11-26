@@ -17,9 +17,9 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 3; % fixed for now: The number of actuated joints
+p.nJoints = 2; % fixed for now: The number of actuated joints
 
-p.nJoints = min(p.nJoints, 6); % 6 is the max for now.
+p.nJoints = min(p.nJoints, 5); % 5 is the max for now.
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
@@ -29,7 +29,7 @@ p.useTorqueObjective = 0;
 p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0;%0.0001;
 p.variableBase = false; % allows base location xb,yb to vary
-p.variableEnd = false; % allows the end effector fixed angle wrt the last link to vary
+p.variableEnd = true; % allows the end effector fixed angle wrt the last link to vary
 p.useGradient = true; % use the gradient in fmincon
 
 % physical parameters: will be used in extra objectives and constraints
@@ -49,7 +49,7 @@ angleMin = -Inf;
 lengthMin = 0;
 lengthMax = 5;
 ub = [ones(p.nJoints*p.nPoses,1)*angleMax;...
-    ones(p.nJoints,1)*lengthMax]; 
+    ones(p.nJoints,1)*lengthMax];
 lb = [ones(p.nJoints*p.nPoses,1)*angleMin;...
     ones(p.nJoints,1)*lengthMin];
 if p.variableBase
@@ -74,7 +74,7 @@ plotResults(x0, p);
 % pause;
 disp('Optimizing...');
 
-% set up problem 
+% set up problem
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
     'SpecifyObjectiveGradient',p.useGradient);
@@ -105,6 +105,20 @@ th = reshape(x(1:p.nPoses*p.nJoints), [p.nJoints, p.nPoses]);
 disp('Angles:')
 disp(num2str(mod(th, 2*pi)));
 
+if p.variableBase
+    disp('Base:')
+    disp(x(p.nJoints*p.nPoses+p.nJoints+(1:2)).');
+end
+
+if p.variableEnd
+    disp('End Eff Offset:')
+    if p.variableBase
+        disp(x(p.nJoints*p.nPoses+p.nJoints+(3)));
+    else
+        disp(x(p.nJoints*p.nPoses+p.nJoints+(1)));
+        
+    end
+end
 
 if p.writeVideo
     close(p.vid);
