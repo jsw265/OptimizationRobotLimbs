@@ -1,4 +1,4 @@
-function x0 = makeInitGuess(p)
+function x0 = makeInitGuess(p, lb, ub)
 % x0 = makeInitGuess(p);
 % make the initial guess: this matters for nonconvex problems.
 
@@ -7,6 +7,24 @@ nJ = p.nJoints;
 % use first angles that are just pointing at the points
 % th01 = atan2(p.yd, p.xd);
 % th0 = [th01, zeros(nP, nJ-1)].';
+
+if p.randomStart
+    % this indicates we want to pick a random initial guess
+    avg = (lb+ub)/2;
+    span = (ub-lb)/2;
+    avg(isinf(avg)|isnan(avg)) = 0;
+    span(isinf(span)|isnan(span)) = pi;% +/- pi for the angles
+    
+    nVars = (nJ*nP + nJ);
+    if p.variableBase
+        nVars = nVars +2;
+    end
+    if p.variableEnd
+       nVars =nVars +1; 
+    end
+    x0 = ((rand(nVars, 1)*2)-1) .* span + avg;
+    
+else
 
 th0 = zeros(nJ, nP);
 
@@ -24,5 +42,5 @@ if p.variableEnd
 end
 
     
-
+end
 end

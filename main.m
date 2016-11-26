@@ -15,10 +15,7 @@ global p
 % Create workspace poses, obstacles, other parameters
 p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
-[xd, yd, thd] = makeArmPoses(p.nPoses);
-p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 1; % fixed for now: The number of actuated joints
-
+p.nJoints = 2; % fixed for now: The number of actuated joints
 p.nJoints = min(p.nJoints, 5); % 5 is the max for now.
 
 % other options? Which functions to use, etc
@@ -28,19 +25,18 @@ p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0;
 p.useTorqueConstraint = 0;
 p.jointSmoothingWeighting = 0;%0.0001;
-p.variableBase = false; % allows base location xb,yb to vary
+p.variableBase = true; % allows base location xb,yb to vary
 p.variableEnd = true; % allows the end effector fixed angle wrt the last link to vary
 p.useGradient = true; % use the gradient in fmincon
+p.randomStart = true;    % we want to pick a random initial guess
+p.useLastTargets = true; % load and reuse the lastSoln.mat, use same xd yd thd
+p.useLastInitialGuess = false; % make a new initial guess
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
 p.jointMaxTorque = 9; % N-m, the Continuous torque output of X-9 module (strongest of the series)
 p.gravity = [0;-9.81;0]; % gravitational acceleration vector in -y direction
 p.linkMassPerLength = .425; % kg/m for thicker pipe. 0.226 kg/m if thinner pipe.
-
-
-% make an initial guess: This will be important since its nonconvex.
-x0 = makeInitGuess(p);
 
 % other bounds
 % Max and min
@@ -60,6 +56,26 @@ if p.variableEnd
     lb = [lb; -Inf];
     ub = [ub; Inf];
 end
+
+%% logic chain to load all or parts of the last solution
+if (p.useLastTargets||p.useLastInitialGuess)&&exist('lastSoln.mat')
+    S = load('lastSoln.mat');
+    if p.useLastTargets
+        xd = S.xd;  yd = S.yd;  thd = S.thd;
+    else
+        [xd, yd, thd] = makeArmPoses(p.nPoses);
+    end
+    if p.useLastInitialGuess
+        x0 = S.x0;
+    else
+        x0 = makeInitGuess(p, lb, ub);
+    end
+else
+    [xd, yd, thd] = makeArmPoses(p.nPoses);
+    % make an initial guess: This will be important since its nonconvex.
+    x0 = makeInitGuess(p, lb, ub);
+end
+p.xd = xd; p.yd = yd; p.thd = thd;
 
 
 % linear equality and inequality
@@ -116,10 +132,11 @@ if p.variableEnd
         disp(x(p.nJoints*p.nPoses+p.nJoints+3));
     else
         disp(x(p.nJoints*p.nPoses+p.nJoints+1));
-        
     end
 end
+disp(['Function Value: ' num2str(fval)])
 
 if p.writeVideo
     close(p.vid);
 end
+save('lastSoln.mat');
