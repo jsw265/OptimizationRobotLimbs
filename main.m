@@ -1,7 +1,5 @@
 % Main function for optimization
 
-% To TEST: add xbase,ybase as design decision variables
-% To TEST: add static end effector angle offset as design decision variable
 % To do: make function that measures joint torques as a function of link
 %        length, number of joints, joint angles, and gravity direction
 % To do: add weights to each pose part. we may only care about end effector
