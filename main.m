@@ -16,7 +16,7 @@ global p
 p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 p.nJoints = 2; % fixed for now: The number of actuated joints
-p.nJoints = min(p.nJoints, 5); % 5 is the max for now.
+p.nJoints = min(p.nJoints, 6); % 5 is the max for now.
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video

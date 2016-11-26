@@ -5,7 +5,7 @@
 % Julian Whitman, 10/26/2016
 
 
-for nJ = 1:5
+for nJ = 6
 
 disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 
