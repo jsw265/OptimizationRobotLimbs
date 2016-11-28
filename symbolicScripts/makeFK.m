@@ -5,14 +5,14 @@
 % Julian Whitman, 10/26/2016
 
 
-for nJ = 1:6
+for nJ = 6
 
 disp(['calculating symbolics for nJ = '  num2str(nJ)]);
 
 lengths = sym('L', [nJ,1]);
 assume(lengths>=0);
 th = sym('th', [nJ,1]); 
-syms xb yb zb real % the base location variables
+syms xb yb zb effOffset real % the base location variables and end effector offset
 
 %% exponential products formula
 % assumes joint angles build off of eachother
@@ -41,13 +41,18 @@ end
 g_st = simplify(g_st);
 g_st = g_st + repmat([zeros(3,3), [xb;yb;zb;]; 0 0 0 0], [1,1,nJ+1]);
 
+% To do: check kinematics more carefully. This is right, but 
+% probably not for 3D
+g_st(1:3,1:3, end) =  R_z(effOffset)*g_st(1:3,1:3, end);
+
+
 % Here we now have:
 % g_st(:,:,1) = base frame wrt inertial
 % g_st(:,:,1+j) =  frame of output of link j wrt inertial
 % g_st(:,:,end) = frame of end effector wrt inertial
 
 %% Make gradients with respect to angles and lengths
-v = [th; lengths];
+% v = [th; lengths];
 xEff = g_st(1,4,end);
 yEff = g_st(2,4,end);
 REff = g_st(1:3,1:3,end);
@@ -57,8 +62,8 @@ rb = [xb; yb; zb]; % the base location
 Rd = rotmat([0;0;1], thd);
 M = eye(3) - REff*Rd.';
 f = (xd - xEff)^2 + (yd - yEff)^2 + sum(sum(M.^2));
-dfdv = jacobian(f, v); % gradient
-ddfddv = jacobian(dfdv,v); % hessian
+% dfdv = jacobian(f, v); % gradient
+% ddfddv = jacobian(dfdv,v); % hessian
 
 % gradients wrt th
 dfdth = jacobian(f, th); % gradient
@@ -68,20 +73,34 @@ ddfddth = jacobian(dfdth, th); % hessian
 dfdl = jacobian(f, lengths); % gradient
 ddfddl = jacobian(dfdl, lengths); % hessian
 
+% gradients wrt base location
+dfdrb = jacobian(f, rb); % gradient
+ddfddrb = jacobian(dfdrb, rb); % hessian
+
+% gradients wrt end eff offset
+dfdeffOffset = jacobian(f, effOffset); % gradient
+ddfddeffOffset = jacobian(dfdeffOffset, effOffset); % hessian
+
 %% here's how we can make this into an optimized matlab function:
 % fFunc = matlabFunction(f, 'vars', {th, lengths, rb, Td});
 % dfdvFunc = matlabFunction(dfdv, 'vars', {th, lengths, rb, Td});
 % ddfddvFunc = matlabFunction(ddfddv, 'vars', {th, lengths, rb, Td});
 
 disp(['writing files for nJ = '  num2str(nJ)]);
-
 % note that these could also be written to a file
-fkFunc = matlabFunction(g_st, 'File', ['fkFunc' num2str(nJ)], 'vars', {th, lengths, rb});
-fFunc = matlabFunction(f, 'File', ['fFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-dfdthFunc = matlabFunction(dfdth, 'File', ['dfdthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-dfdlFunc = matlabFunction(dfdl, 'File', ['dfdlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-ddfddthFunc = matlabFunction(ddfddth, 'File', ['ddfddthFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
-ddfddlFunc = matlabFunction(ddfddl, 'File', ['ddfddlFunc' num2str(nJ)], 'vars', {th, lengths, rb, Td});
+folder = 'fkFunctions\';
+fkFunc = matlabFunction(g_st, 'File', [folder 'fkFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset});
+folder = 'costFunctions\';
+
+fFunc = matlabFunction(f, 'File', [folder 'fFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+dfdthFunc = matlabFunction(dfdth, 'File', [folder 'dfdthFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+dfdlFunc = matlabFunction(dfdl, 'File', [folder 'dfdlFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+dfdrbFunc = matlabFunction(dfdrb, 'File', [folder 'dfdrbFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+dfdeffOffsetFunc = matlabFunction(dfdeffOffset, 'File', [folder 'dfdeffOffsetFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+ddfddthFunc = matlabFunction(ddfddth, 'File', [folder 'ddfddthFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+ddfddlFunc = matlabFunction(ddfddl, 'File', [folder 'ddfddlFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+ddfddrbFunc = matlabFunction(ddfddrb, 'File', [folder 'ddfddrbFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
+ddfddeffOffsetFunc = matlabFunction(ddfddeffOffset, 'File', [folder 'ddfddeffOffsetFunc' num2str(nJ)], 'vars', {th, lengths, rb, effOffset, Td});
 
 end
 disp('Done');

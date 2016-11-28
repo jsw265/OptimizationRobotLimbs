@@ -4,7 +4,8 @@ function  [c,ceq,gradc,gradceq] = nonlconFunc(x,p)
 % the c<=0, its gradient, ceq==0, and its gradient wrt x.
 % Given Parameters structure p
 nJ = p.nJoints;
-if p.useTorqueConstraint
+
+if 0 %p.useTorqueConstraint
     th = reshape(x(1:p.nPoses*nJ), [nJ, p.nPoses]);
     lengths = x(p.nPoses*nJ+1 : end);
     rb = [0;0;0];
