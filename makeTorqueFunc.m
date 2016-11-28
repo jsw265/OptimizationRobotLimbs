@@ -68,9 +68,10 @@ end
 PE = PE+gravity*(p.linkMassPerLength*lengths(nJ))...
         *g_st_com(2,4,nJ);
 Lagrangian = PE;
-tau = jacobian(Lagrangian,v)';
-dtau = jacobian(tau,v);
-f_tau = sum(tau.^2);
+tau = jacobian(Lagrangian,v);
+f_tau = sum(tau'.^2);
+g_tau = tau(1:nJ);
+gd_tau = jacobian(g_tau,v);
 
 % Gradient and Hessian with respect to torque (tau)
 df_torquedth = jacobian(f_tau, th); % Gradient
@@ -80,8 +81,9 @@ ddf_torqueddl = jacobian(df_torquedl, lengths); % Hessian
 
 disp(['writing files for nJ = '  num2str(nJ)]);
 
-g_torqueFunc = matlabFunction(tau, 'File', ['g_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
-gd_torqueFunc = matlabFunction(dtau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+g_torqueFunc = matlabFunction(g_tau, 'File', ['g_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+gd_torquethFunc = matlabFunction(gd_tau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+gd_torquelFunc = matlabFunction(dg_tau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 f_torqueFunc = matlabFunction(f_tau, 'File', ['f_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 df_torquedthFunc = matlabFunction(df_torquedth, 'File', ['df_torquedthFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 ddf_torqueddthFunc = matlabFunction(ddf_torqueddth, 'File', ['ddf_torqueddthFunc' num2str(nJ)], 'vars', {th, lengths, rb});

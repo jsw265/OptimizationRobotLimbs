@@ -17,13 +17,13 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 [xd, yd, thd] = makeArmPoses(p.nPoses);
 p.xd = xd; p.yd = yd; p.thd = thd;
-p.nJoints = 3; % fixed for now: The number of actuated joints
+p.nJoints = 2; % fixed for now: The number of actuated joints
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
-p.useTorqueObjective = 0.0001;
+p.useTorqueObjective = 0.0003;
 p.useTorqueConstraint = 1;
 
 % physical parameters: will be used in extra objectives and constraints
@@ -61,7 +61,8 @@ disp('Optimizing...');
 % set up problem 
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
-    'SpecifyObjectiveGradient',true);
+    'SpecifyObjectiveGradient',true,'MaxFunctionEvaluations',10000,...
+    'StepTolerance',1.0e-100,'SpecifyConstraintGradient',true);
 problem.options = options;
 problem.solver = 'fmincon';
 problem.objective = @(x)(objFunc(x,p));

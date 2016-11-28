@@ -9,14 +9,13 @@ if p.useTorqueConstraint
     lengths = x(p.nPoses*nJ+1 : end);
     rb = [0;0;0];
     % To do: add these if needed
-    tau = zeros(p.nPoses*nJ,1);
+    tau = zeros(1,p.nPoses*nJ);
     for i = 1:p.nPoses
         g_temp = g_torqueFunc(th(:,i), lengths, rb);
-        tau(1+nJ*(i-1):nJ*i) = g_temp(1:nJ);
-        g_temp = gd_torqueFunc(th(:,i), lengths, rb);
-        dtau(1+nJ*(i-1):nJ*i) = g_temp(1:nJ);
+        tau(1+nJ*(i-1):nJ*i) = g_temp;
+        dtau(1:nJ,1+2*nJ*(i-1):2*nJ*i) = gd_torqueFunc(th(:,i), lengths, rb);
     end
-    c=tau-p.jointMaxTorque*ones(p.nPoses*nJ,1);
+    c=tau-p.jointMaxTorque*ones(1,p.nPoses*nJ);
     gradc =dtau;
 else
     c = [];
@@ -24,6 +23,5 @@ else
 end
 ceq=[];
 gradceq =[];
-
 
 end
