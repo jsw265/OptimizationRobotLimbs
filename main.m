@@ -15,6 +15,7 @@ p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
 p.nJoints = 3; % fixed for now: The number of actuated joints
 p.nJoints = min(p.nJoints, 6); % 5 is the max for now.
+p.nRestarts = 3; % Number of random initial conditions to try, conflicts with useLastInitialGuess
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
@@ -83,7 +84,7 @@ Aeq = []; beq = [];
 
 % initial conditions plot
 startPlot;
-plotResults(x0, p);
+plotResults(x0(:,1), p);
 
 % disp('Press any key to start');
 % pause;
@@ -98,7 +99,7 @@ options = optimoptions('fmincon',...
 problem.options = options;
 problem.solver = 'fmincon';
 problem.objective = @(x)(objFunc(x,p));
-problem.x0 = x0;
+problem.x0 = x0(:,1);
 problem.ub = ub;
 problem.lb = lb;
 problem.A = A;
@@ -109,7 +110,21 @@ problem.nonlcon = @(x)(nonlconFunc(x,p));
 
 % run optimization
 tic;
-[x,fval,exitflag,output,lambda,grad,hessian] = fmincon(problem);
+bestValue = inf;
+for iRestart = 1:size(x0,2)
+    problem.x0 = x0(:,iRestart);
+    [tempx,tempfval,tempexitflag,tempoutput,templambda,tempgrad,temphessian] = fmincon(problem);
+    disp(tempfval)
+    if tempfval < bestValue
+        x = tempx;
+        fval = tempfval;
+        exitflag = tempexitflag;
+        foutput = tempoutput;
+        lambda = templambda;
+        grad = tempgrad;
+        hessian = temphessian;
+    end
+end
 timeToOpt = toc;
 
 % visualize results

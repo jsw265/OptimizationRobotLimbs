@@ -20,27 +20,33 @@ if p.randomStart
         nVars = nVars +2;
     end
     if p.variableEnd
-       nVars =nVars +1; 
+        nVars =nVars +1;
     end
-    x0 = ((rand(nVars, 1)*2)-1) .* span + avg;
+    
+    x0 = zeros(nVars,p.nRestarts);
+    for iIter = 1:p.nRestarts
+        x0(:,iIter) = ((rand(nVars, 1)*2)-1) .* span + avg;
+    end
+    
+    
     
 else
-
-th0 = zeros(nJ, nP);
-
-l1_0 = mean(sqrt(p.xd.^2 + p.yd.^2));
-l0 = [l1_0; zeros(nJ-1, 1)];
-
-% x = [thjoint1_pose1, th2_1, th3_1, th2_1, ...  lengths];
-x0 = [th0(:); l0];
-
-if p.variableBase
-    x0 = [x0; 0;0];
-end
-if p.variableEnd
-    x0 = [x0; 0];
-end
-
+    
+    th0 = zeros(nJ, nP);
+    
+    l1_0 = mean(sqrt(p.xd.^2 + p.yd.^2));
+    l0 = [l1_0; zeros(nJ-1, 1)];
+    
+    % x = [thjoint1_pose1, th2_1, th3_1, th2_1, ...  lengths];
+    x0 = [th0(:); l0];
+    
+    if p.variableBase
+        x0 = [x0; 0;0];
+    end
+    if p.variableEnd
+        x0 = [x0; 0];
+    end
+    
     
 end
 end
