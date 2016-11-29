@@ -13,25 +13,23 @@ global p
 % Create workspace poses, obstacles, other parameters
 p = []; % parameters structure: includes all non-decision variables
 p.nPoses = 5; % number of poses that we are trying to fit
-p.nJoints = 2; % fixed for now: The number of actuated joints
+p.nJoints = 3; % fixed for now: The number of actuated joints
 p.nJoints = min(p.nJoints, 6); % 5 is the max for now.
-
 
 % other options? Which functions to use, etc
 p.writeVideo = false; % A flag to say whether to make a video
 p.positionErrorObjectiveWeighting = 1.01; % May want to split into rotational and positional error
 p.lengthObjectiveWeighting = 0.0275;
 
-p.useTorqueObjective = 0;
-p.useTorqueConstraint = 0;
+p.useTorqueObjective = 0.00001;
+p.useTorqueConstraint = true;
 p.jointSmoothingWeighting = 0;%0.0001;
 p.variableBase = true; % allows base location xb,yb to vary
 p.variableEnd = true; % allows the end effector fixed angle wrt the last link to vary
 p.useGradient = true; % use the gradient in fmincon
 p.randomStart = true;    % we want to pick a random initial guess
-p.useLastTargets = true; % load and reuse the lastSoln.mat, use same xd yd thd
+p.useLastTargets = false; % load and reuse the lastSoln.mat, use same xd yd thd
 p.useLastInitialGuess = false; % make a new initial guess
-
 
 % physical parameters: will be used in extra objectives and constraints
 p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
@@ -94,7 +92,8 @@ disp('Optimizing...');
 % set up problem
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
-    'SpecifyObjectiveGradient',p.useGradient);
+    'SpecifyObjectiveGradient',p.useGradient,...
+    'SpecifyConstraintGradient',p.useTorqueConstraint);
 
 problem.options = options;
 problem.solver = 'fmincon';
@@ -135,6 +134,16 @@ if p.variableEnd
     else
         disp(x(p.nJoints*p.nPoses+p.nJoints+1));
     end
+end
+if p.useTorqueConstraint || p.useTorqueObjective
+    torque = zeros(p.nJoints,p.nPoses);
+    for i=1:p.nPoses
+        torque(1+p.nJoints*(i-1):p.nJoints*i) = ...
+            g_torqueFunc(th(:,i), x(p.nJoints*p.nPoses+(1:p.nJoints)),...
+            [0;0;0]);
+    end
+    disp('Torque:')
+    disp(num2str(torque));
 end
 disp(['Function Value: ' num2str(fval)])
 

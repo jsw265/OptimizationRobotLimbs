@@ -17,7 +17,7 @@ w = repmat([0 0 1].', [1,nJ]); % the joint axis: all are in plane for now
 if nJ>1
 q = [[0 cumsum(lengths(1:nJ-1)).']; zeros(2,nJ)]; % each col is a position of a joint at th = 0
 else
-q = [0 ; 0;0];
+q = [0;0;0];
 end
 xiv = [-cross(w,q); w];
 
@@ -39,6 +39,10 @@ for i = 1:nJ+1
 end
 g_st = simplify(g_st);
 g_st = g_st + repmat([zeros(3,3), [xb;yb;zb;]; 0 0 0 0], [1,1,nJ+1]);
+
+% To do: check kinematics more carefully. This is right, but 
+% probably not for 3D
+%g_st(1:3,1:3, end) =  R_z(effOffset)*g_st(1:3,1:3, end);
 
 % Here we now have:
 % g_st(:,:,1) = base frame wrt inertial
@@ -82,8 +86,7 @@ ddf_torqueddl = jacobian(df_torquedl, lengths); % Hessian
 disp(['writing files for nJ = '  num2str(nJ)]);
 
 g_torqueFunc = matlabFunction(g_tau, 'File', ['g_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
-gd_torquethFunc = matlabFunction(gd_tau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
-gd_torquelFunc = matlabFunction(dg_tau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
+gd_torqueFunc = matlabFunction(gd_tau, 'File', ['gd_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 f_torqueFunc = matlabFunction(f_tau, 'File', ['f_torqueFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 df_torquedthFunc = matlabFunction(df_torquedth, 'File', ['df_torquedthFunc' num2str(nJ)], 'vars', {th, lengths, rb});
 ddf_torqueddthFunc = matlabFunction(ddf_torqueddth, 'File', ['ddf_torqueddthFunc' num2str(nJ)], 'vars', {th, lengths, rb});

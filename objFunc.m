@@ -87,12 +87,19 @@ end
 %% evaluate extra objective 1: torques from gravity
 if p.useTorqueObjective
     f_torque_i = f_torqueFunc(th(:,i), lengths, rb);
-    f = f+p.useTorqueObjective*f_torque_i;
-    df_torquedth_i = dfdthFunc(th(:,i), lengths, rb, Td(:,i));
-    df_torquedl_i = dfdlFunc(th(:,i), lengths, rb, Td(:,i));
+    df_torquedth_i = df_torquedthFunc(th(:,i), lengths, rb);
+    df_torquedl_i = df_torquedlFunc(th(:,i), lengths, rb);
     df_torque_i = zeros(1,nP*nJ+nJ);
-    df_torque_i( (i*nJ - (nJ-1)):(i*nJ) ) = df_torquedth_i;
+    df_torque_i((i-1)*nJ+1:(i*nJ)) = df_torquedth_i;
     df_torque_i( nJ*nP+1:end) = df_torquedl_i;
+    
+    if p.variableBase
+        df_torque_i = [df_torque_i,0,0];
+    end
+    if p.variableEnd
+        df_torque_i = [df_torque_i, 0];
+    end
+    f = f+p.useTorqueObjective*f_torque_i;
     df = df + p.useTorqueObjective*df_torque_i;
 end
 

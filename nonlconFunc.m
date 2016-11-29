@@ -4,20 +4,31 @@ function  [c,ceq,gradc,gradceq] = nonlconFunc(x,p)
 % the c<=0, its gradient, ceq==0, and its gradient wrt x.
 % Given Parameters structure p
 nJ = p.nJoints;
+nP = p.nPoses;
 
-if 0 %p.useTorqueConstraint
-    th = reshape(x(1:p.nPoses*nJ), [nJ, p.nPoses]);
-    lengths = x(p.nPoses*nJ+1 : end);
+if p.useTorqueConstraint
+    th = reshape(x(1:nP*nJ), [nJ, nP]);
+    lengths = x(nP*nJ+1 : end);
     rb = [0;0;0];
     % To do: add these if needed
-    tau = zeros(1,p.nPoses*nJ);
-    for i = 1:p.nPoses
-        g_temp = g_torqueFunc(th(:,i), lengths, rb);
-        tau(1+nJ*(i-1):nJ*i) = g_temp;
-        dtau(1:nJ,1+2*nJ*(i-1):2*nJ*i) = gd_torqueFunc(th(:,i), lengths, rb);
+    tau = zeros(1,nP*nJ);
+    dtau = zeros(nJ*(nP+1),nJ*nP);
+    if p.variableBase
+        dtau = [dtau; zeros(2,nJ*nP)];
     end
-    c=tau-p.jointMaxTorque*ones(1,p.nPoses*nJ);
-    gradc =dtau;
+    if p.variableEnd
+        dtau = [dtau; zeros(1,nJ*nP)];
+    end
+    for i = 1:nP
+        tau(1+nJ*(i-1):nJ*i) = g_torqueFunc(th(:,i), lengths, rb);
+        g_temp = gd_torqueFunc(th(:,i), lengths, rb)';
+        dtau(nJ*(i-1)+1:nJ*i,1+nJ*(i-1):nJ*i) = g_temp(1:nJ,1:nJ);
+        dtau(nJ*nP+1:nJ*(nP+1),1+nJ*(i-1):nJ*i) = g_temp(nJ+1:2*nJ,1:nJ);
+    end
+    c=tau-p.jointMaxTorque*ones(1,nP*nJ);
+    c=[c -tau-p.jointMaxTorque*ones(1,nP*nJ)];
+    gradc = dtau;
+    gradc = [gradc -dtau];
 else
     c = [];
     gradc =[];
