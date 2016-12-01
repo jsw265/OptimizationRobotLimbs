@@ -1,5 +1,14 @@
 % Main function for optimization
 
+% Notes for IneqConstr Branch:
+% - Can't use variableEnd since that portion is in the position objective.
+% - variableBase doesn't work on it for some reason as well
+% - Weights have to be changed for it to work properly
+% - All previous mentions are done in an if statement if IneqConstr is true
+% - Simulation works as well as before, but the solver looks a lot different,
+% this may be good to show in the report/presentation
+
+
 % To do: make function that measures joint torques as a function of link
 %        length, number of joints, joint angles, and gravity direction
 % To do: add weights to each pose part. we may only care about end effector
@@ -25,7 +34,7 @@ p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.00001;
 p.useTorqueConstraint = true;
 p.jointSmoothingWeighting = 0;%0.0001;
-p.variableBase = false; % allows base location xb,yb to vary
+p.variableBase = true; % allows base location xb,yb to vary
 p.variableEnd = true; % allows the end effector fixed angle wrt the last link to vary
 p.IneqConstr = true; % Turn position error portion of Ojective function to an ineqality constraint
 p.useGradient = true; % use the gradient in fmincon
@@ -40,10 +49,14 @@ p.gravity = [0;-9.81;0]; % gravitational acceleration vector in -y direction
 p.linkMassPerLength = .425; % kg/m for thicker pipe. 0.226 kg/m if thinner pipe.
 p.IneqConstrVal = 1e-4; % How small each position error must be
 
+% Change weihgtings if position error objective is turned off
 if p.IneqConstr == true
     p.positionErrorObjectiveWeighting = 0;
+    p.variableEnd = false;
+    p.variableBase = false;
+    
     p.lengthObjectiveWeighting = 0.9;
-       p.useTorqueObjective = 1 - p.lengthObjectiveWeighting;
+    p.useTorqueObjective = 1 - p.lengthObjectiveWeighting;
 end
 
 % other bounds
@@ -101,7 +114,7 @@ disp('Optimizing...');
 % set up problem
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
-    'GradObj','on',...
+    'GradObj','on',... % Need thses options for pre 2016 versions of Matlab
     'GradConstr','off');
 %     'SpecifyObjectiveGradient',p.useGradient,...
 %     'SpecifyConstraintGradient',p.useTorqueConstraint);

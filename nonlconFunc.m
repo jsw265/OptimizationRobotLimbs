@@ -7,7 +7,7 @@ nJ = p.nJoints;
 nP = p.nPoses;
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% Have to put this here since it is now a constraint %%%%%%%%%%%%
 f = 0;
 nVars = length(x);
 df = zeros(1,nVars); 
@@ -37,7 +37,16 @@ else
 end
 
 Td = [p.xd p.yd p.thd].';
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% for i = 1:nP
+% if p.variableEnd
+%        df(effVarInd ) = df(effVarInd) + ...
+%            p.positionErrorObjectiveWeighting*dfdeffOffsetFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
+% ddf(effVarInd,effVarInd) = ddf(effVarInd,effVarInd) + ...
+%     p.positionErrorObjectiveWeighting*ddfddeffOffsetFunc(th(:,i), lengths, rb, effOffset, Td(:,i));
+% end
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
