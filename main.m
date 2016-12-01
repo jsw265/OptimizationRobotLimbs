@@ -25,8 +25,9 @@ p.lengthObjectiveWeighting = 0.0275;
 p.useTorqueObjective = 0.00001;
 p.useTorqueConstraint = true;
 p.jointSmoothingWeighting = 0;%0.0001;
-p.variableBase = true; % allows base location xb,yb to vary
+p.variableBase = false; % allows base location xb,yb to vary
 p.variableEnd = true; % allows the end effector fixed angle wrt the last link to vary
+p.IneqConstr = true; % Turn position error portion of Ojective function to an ineqality constraint
 p.useGradient = true; % use the gradient in fmincon
 p.randomStart = true;    % we want to pick a random initial guess
 p.useLastTargets = false; % load and reuse the lastSoln.mat, use same xd yd thd
@@ -37,6 +38,13 @@ p.jointMass = .36; % kg, X-9 module mass (heaviest of the series)
 p.jointMaxTorque = 9; % N-m, the Continuous torque output of X-9 module (strongest of the series)
 p.gravity = [0;-9.81;0]; % gravitational acceleration vector in -y direction
 p.linkMassPerLength = .425; % kg/m for thicker pipe. 0.226 kg/m if thinner pipe.
+p.IneqConstrVal = 1e-4; % How small each position error must be
+
+if p.IneqConstr == true
+    p.positionErrorObjectiveWeighting = 0;
+    p.lengthObjectiveWeighting = 0.9;
+       p.useTorqueObjective = 1 - p.lengthObjectiveWeighting;
+end
 
 % other bounds
 % Max and min
@@ -93,8 +101,10 @@ disp('Optimizing...');
 % set up problem
 options = optimoptions('fmincon',...
     'Algorithm','interior-point',...
-    'SpecifyObjectiveGradient',p.useGradient,...
-    'SpecifyConstraintGradient',p.useTorqueConstraint);
+    'GradObj','on',...
+    'GradConstr','off');
+%     'SpecifyObjectiveGradient',p.useGradient,...
+%     'SpecifyConstraintGradient',p.useTorqueConstraint);
 
 problem.options = options;
 problem.solver = 'fmincon';
