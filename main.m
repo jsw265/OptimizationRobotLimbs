@@ -1,6 +1,8 @@
 % Main function for optimization
 
 % Notes for IneqConstr Branch:
+% - Lines 120-121 need may need to replace lines 118-119 on Matlab 2016
+% (Pre 2016 Matlab needs to use Legacy options for optimopts)
 % - Can't use variableEnd since that portion is in the position objective.
 % - variableBase doesn't work on it for some reason as well
 % - Weights have to be changed for it to work properly
